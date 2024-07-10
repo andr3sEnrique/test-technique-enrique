@@ -1,23 +1,54 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../slices/productsSlice";
-import { CircularProgress, List, ListItem, ListItemText } from '@mui/material';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { deleteProduct, fetchProducts } from "../slices/productsSlice";
+import { CircularProgress, List, ListItem, ListItemText, Typography, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Box, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
+import ProductForm from "./ProductForm";
 
 const ProdutsList = () => {
     const dispatch = useDispatch();
     const products = useSelector((state) => state.products.products);
     const status = useSelector((state) => state.products.status);
     const error = useSelector((state) => state.products.error);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         if (status === 'idle') {
             dispatch(fetchProducts());
         }
     }, [status, dispatch]);
+
+
+    const handleClickOpen = (product) => {
+        setSelectedProduct(product);
+        setOpen(true);
+    };
+
+    const handleEdit = (product) => {
+        setSelectedProduct(product);
+        setIsEditing(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsEditing(false);
+        setSelectedProduct(null);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedProduct(null);
+    };
+
+    const handleDelete = () => {
+        if (selectedProduct) {
+            dispatch(deleteProduct(selectedProduct._id));
+            handleClose();
+        }
+    };
 
     let content;
 
@@ -79,8 +110,12 @@ const ProdutsList = () => {
                                     </Typography>
                                 </>
                             } />
-                            <Button variant="outlined" sx={{ marginRight: '10px' }} color="success" size="large">+</Button>
-                            <Button variant="outlined" color="error" size="large">-</Button>
+                            <IconButton edge="end" aria-label="edit" color="success" sx={{ marginRight: '10px' }} onClick={() => handleEdit(product)}>
+                                <EditIcon />
+                            </IconButton>
+                            <IconButton edge="end" aria-label="delete" color="error" onClick={() => handleClickOpen(product)}>
+                                <DeleteIcon />
+                            </IconButton>
                         </ListItem>
                     ))}
                 </List>
@@ -93,8 +128,33 @@ const ProdutsList = () => {
 
     return (
         <div>
-            <h2>List of Products</h2>
+           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <h2>List of Products</h2>
+                <Button variant="contained" color="success">+</Button>
+            </Box> 
             {content}
+            {isEditing && (
+                <ProductForm product={selectedProduct} open={isEditing} onClose={handleCloseModal} />
+            )}
+            <Dialog
+                open={open}
+                onClose={handleClose}
+            >
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to remove this product?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 
