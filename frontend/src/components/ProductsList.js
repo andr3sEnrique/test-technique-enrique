@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteProduct, fetchProducts } from "../slices/productsSlice";
+import { deleteProduct, fetchProducts, updateProduct, createProduct } from "../slices/productsSlice";
 import { CircularProgress, List, ListItem, ListItemText, Typography, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Box, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,6 +28,11 @@ const ProdutsList = () => {
         setOpen(true);
     };
 
+    const handleCreate = () => {
+        setSelectedProduct(null);
+        setIsEditing(true);
+    };
+
     const handleEdit = (product) => {
         setSelectedProduct(product);
         setIsEditing(true);
@@ -48,6 +53,15 @@ const ProdutsList = () => {
             dispatch(deleteProduct(selectedProduct._id));
             handleClose();
         }
+    };
+
+    const handleSave = (productData) => {
+        if (selectedProduct) {
+            dispatch(updateProduct({ id: selectedProduct._id, updateProduct: productData }));
+        } else {
+            dispatch(createProduct(productData));
+        }
+        handleCloseModal();
     };
 
     let content;
@@ -130,11 +144,11 @@ const ProdutsList = () => {
         <div>
            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <h2>List of Products</h2>
-                <Button variant="contained" color="success">+</Button>
+                <Button variant="contained" color="success" onClick={handleCreate}>+</Button>
             </Box> 
             {content}
             {isEditing && (
-                <ProductForm product={selectedProduct} open={isEditing} onClose={handleCloseModal} />
+                <ProductForm product={selectedProduct} open={isEditing} onClose={handleCloseModal} onSave={handleSave} />
             )}
             <Dialog
                 open={open}

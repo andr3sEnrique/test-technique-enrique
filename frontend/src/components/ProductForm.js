@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { updateProduct } from "../slices/productsSlice";
 import { Modal, Box, TextField, Button, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel } from '@mui/material';
 
-const ProductForm = ({ product, open, onClose }) => {
-    const dispatch = useDispatch();
+const ProductForm = ({ product, open, onClose, onSave }) => {
     const [formData, setFormData] = useState({ ...product });
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        setFormData({ ...product });
+        if (product) {
+            setFormData({ ...product });
+        } else {
+            setFormData({ name: '', type: '', price: '', rating: '', warrantly_years: '', available: false });
+        }
     }, [product]);
+
 
     const validate = () => {
         let temp = {};
@@ -36,7 +38,7 @@ const ProductForm = ({ product, open, onClose }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
-            dispatch(updateProduct({ id: product._id, updateProduct: formData}));
+            onSave(formData);
             onClose();
         }
     };
