@@ -4,24 +4,24 @@ import { deleteProduct, fetchProducts, updateProduct, createProduct } from "../s
 import { CircularProgress, List, ListItem, ListItemText, Typography, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Box, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import ProductForm from "./ProductForm";
 
-const ProdutsList = () => {
+const ProductsList = () => {
     const dispatch = useDispatch();
     const products = useSelector((state) => state.products.products);
     const status = useSelector((state) => state.products.status);
     const error = useSelector((state) => state.products.error);
+    const token = useSelector((state) => state.auth.token);
+
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [open, setOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
-        if (status === 'idle') {
+        if (status === 'idle' && token) {
             dispatch(fetchProducts());
         }
-    }, [status, dispatch]);
-
+    }, [status, dispatch, token]);
 
     const handleClickOpen = (product) => {
         setSelectedProduct(product);
@@ -68,7 +68,7 @@ const ProdutsList = () => {
 
     if (status === 'loading') {
         content = <CircularProgress />;
-    } else if (status === 'succeeded'){
+    } else if (status === 'succeeded') {
         content = (
             <Card style={{
                 width: '100%',
@@ -76,7 +76,7 @@ const ProdutsList = () => {
                 boxShadow: 'rgba(0, 0, 0, 0.2) 0px 4px 8px 0px',
                 marginBottom: '16px',
             }}>
-                <CardContent >
+                <CardContent>
                 <List>
                     {products.map((product) => (
                         <ListItem key={product._id}>
@@ -145,7 +145,7 @@ const ProdutsList = () => {
            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <h2>List of Products</h2>
                 <Button variant="contained" color="success" onClick={handleCreate}>+</Button>
-            </Box> 
+            </Box>
             {content}
             {isEditing && (
                 <ProductForm product={selectedProduct} open={isEditing} onClose={handleCloseModal} onSave={handleSave} />
@@ -171,7 +171,6 @@ const ProdutsList = () => {
             </Dialog>
         </div>
     );
-
 };
 
-export default ProdutsList;
+export default ProductsList;

@@ -4,12 +4,13 @@ import { Modal, Box, TextField, Button, RadioGroup, FormControlLabel, Radio, For
 const ProductForm = ({ product, open, onClose, onSave }) => {
     const [formData, setFormData] = useState({ ...product });
     const [errors, setErrors] = useState({});
-
+    const [buttonText, setButtonText] = useState('Update');
     useEffect(() => {
         if (product) {
             setFormData({ ...product });
         } else {
             setFormData({ name: '', type: '', price: '', rating: '', warrantly_years: '', available: false });
+            setButtonText('Add')
         }
     }, [product]);
 
@@ -59,7 +60,7 @@ const ProductForm = ({ product, open, onClose, onSave }) => {
                     </RadioGroup>
                 </FormControl>
                 <Box mt={2}>
-                    <Button type="submit" variant="contained" color="primary">Update</Button>
+                    <Button type="submit" variant="contained" color="primary">{buttonText}</Button>
                 </Box>
             </Box>
         </Modal>

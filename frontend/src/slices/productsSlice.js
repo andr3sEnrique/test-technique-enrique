@@ -7,23 +7,47 @@ const initialState = {
     error: null,
 };
 
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
-    const response = await axios.get('http://localhost:5000/products');
+export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { getState }) => {
+    const state = getState();
+    const token = state.auth.token;
+    const response = await axios.get('http://localhost:5000/products', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return response.data;
 });
 
-export const deleteProduct = createAsyncThunk('products/deleteProduct', async (id) => {
-    await axios.delete(`http://localhost:5000/products/${id}`);
+export const deleteProduct = createAsyncThunk('products/deleteProduct', async (id, { getState }) => {
+    const state = getState();
+    const token = state.auth.token;
+    await axios.delete(`http://localhost:5000/products/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return id;
 });
 
-export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, updateProduct }) => {
-    const response = await axios.put(`http://localhost:5000/products/${id}`, updateProduct);
+export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, updateProduct }, { getState }) => {
+    const state = getState();
+    const token = state.auth.token;
+    const response = await axios.put(`http://localhost:5000/products/${id}`, updateProduct, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return response.data;
 });
 
-export const createProduct = createAsyncThunk('products/createProduct', async (newProduct) => {
-    const response = await axios.post('http://localhost:5000/products', newProduct);
+export const createProduct = createAsyncThunk('products/createProduct', async (newProduct, { getState }) => {
+    const state = getState();
+    const token = state.auth.token;
+    const response = await axios.post('http://localhost:5000/products', newProduct, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return response.data;
 });
 
